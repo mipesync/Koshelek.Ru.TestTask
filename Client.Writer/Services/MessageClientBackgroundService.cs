@@ -25,7 +25,7 @@ public class MessageClientBackgroundService : BackgroundService
         {
             try
             {
-                await _messageClient.SendMessagesAsync(100, TimeSpan.FromMilliseconds(500));
+                await _messageClient.SendMessagesAsync(5000, TimeSpan.FromMilliseconds(500));
             }
             catch (Exception ex)
             {

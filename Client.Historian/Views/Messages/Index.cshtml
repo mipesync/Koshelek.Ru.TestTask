@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "Messages";
+}
+
+<h2>Messages</h2>
+
+<div>
+    <form id="dateForm">
+        <div>
+            <label for="startDate">Start Date and Time:</label>
+            <input type="datetime-local" id="startDate" name="startDate" required>
+        </div>
+        <div>
+            <label for="endDate">End Date and Time:</label>
+            <input type="datetime-local" id="endDate" name="endDate" required>
+        </div>
+        <button type="button" onclick="loadMessages()">Load Messages</button>
+    </form>
+</div>
+
+<div id="messageHistory"></div>
+
+<script>
+    function loadMessages() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+
+        const from = new Date(startDate).toISOString();
+        const to = new Date(endDate).toISOString();
+
+        const apiUrl = '@ViewBag.BackendUrl';
+        const url = `${apiUrl}/message?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const historyContainer = document.getElementById('messageHistory');
+                historyContainer.innerHTML = '';
+
+                if (data.length === 0) {
+                    historyContainer.innerHTML = 'No messages found for the selected period.';
+                    return;
+                }
+
+                data.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `Message ID: ${message.id}, Content: ${message.content}, Received at: ${new Date(message.timestamp).toLocaleString()}`;
+                    historyContainer.appendChild(messageElement);
+                });
+            })
+            .catch(error => console.error('Error fetching messages:', error));
+    }
+</script>

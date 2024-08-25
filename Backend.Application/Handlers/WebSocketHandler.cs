@@ -64,7 +64,7 @@ public class WebSocketHandler
     {
         if (!Sockets.IsEmpty)
         {
-            _logger.LogInformation("Sending a message to connections...");
+            _logger.LogInformation($"Sending a message to {Sockets.Count} connections...");
             foreach (var socket in Sockets)
             {
                 if (socket.Value.State != WebSocketState.Open)

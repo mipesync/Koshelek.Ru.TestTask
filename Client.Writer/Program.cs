@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-const string backendUrl = "http://localhost:5241/api/message";
-
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
@@ -14,6 +12,8 @@ var host = Host.CreateDefaultBuilder(args)
             config.AddConsole();
             config.SetMinimumLevel(LogLevel.Information);
         });
+
+        var backendUrl = context.Configuration["BackendUrl"]!;
 
         services.AddSingleton<MessageClient>(provider =>
         {

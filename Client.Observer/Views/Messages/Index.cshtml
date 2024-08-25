@@ -1,0 +1,47 @@
+﻿@{
+ViewData["Title"] = "Messages";
+}
+
+<h2>Messages</h2>
+
+<ul id="messagesList"></ul>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+        function fetchMessages() {
+            $.ajax({
+                url: '@Url.Action("GetMessages", "Messages")',
+                method: 'GET',
+                success: function (messages) {
+                    let list = $('#messagesList');
+                    list.empty();
+                    messages.forEach(function (message) {
+                        let li = $('<li></li>').text(message.orderId + ": " + message.content + " (" + new Date(message.timestamp).toLocaleTimeString() + ")");
+                        list.append(li);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching messages:', error);
+                }
+            });
+        }
+
+        function startWebSocket() {
+            $.ajax({
+                url: '@Url.Action("ConnectToWebSocket", "Messages")',
+                method: 'GET',
+                success: function () {
+                    console.log('WebSocket connection established');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error connecting to WebSocket:', error);
+                }
+            });
+        }
+
+        startWebSocket();
+        setInterval(fetchMessages, 500);
+    });
+</script>
+}

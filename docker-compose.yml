@@ -1,0 +1,79 @@
+services:
+  client-writer:
+    build:
+      dockerfile: ./Client.Writer/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5001
+      - ConnectionStrings__PostgreSQL=Host=postgres;Database=KoshelekDB;Username=postgres;Password=dbPassword
+      - BackendUrl=http://backend-api:5241/api/message
+    ports:
+      - "5001:5001"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  client-observer:
+    build:
+      dockerfile: ./Client.Observer/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5044
+      - ConnectionStrings__PostgreSQL=Host=postgres;Database=KoshelekDB;Username=postgres;Password=dbPassword
+      - WebSocketUrl=ws://backend-api:5241/ws
+    ports:
+      - "5044:5044"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  client-historian:
+    build:
+      dockerfile: ./Client.Historian/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5190
+      - ConnectionStrings__PostgreSQL=Host=postgres;Database=KoshelekDB;Username=postgres;Password=dbPassword
+      - BackendUrl=http://backend-api:5241/api
+    ports:
+      - "5190:5190"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  backend-api:
+    build:
+      dockerfile: ./Backend.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5241
+      - ConnectionStrings__PostgreSQL=Host=postgres;Database=KoshelekDB;Username=postgres;Password=dbPassword
+    ports:
+      - "5241:5241"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: KoshelekDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dbPassword
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres-data:
